@@ -4,6 +4,7 @@ import json
 import os
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 url = "3446017"
 if url.isdigit():
@@ -83,24 +84,24 @@ print(f'PAGES: ｢{info["filecount"]}｣')
 print("-------------------------")
 print(f'TAGS: ｢{", ".join(get_tags())}｣')
 print("-------------------------")
-ans = input("wanna download? (y / Y): ")
+print("BEFORE DOWNLOAD . . . ")
 print("-------------------------")
-if ans == 'y' or ans == 'Y':
-    n = int(input('page from: '))
-    m = int(input('page to: '))
-    if m > info["filecount"]:
-        m = info["filecount"]
-        print("page to can't exceed the total page")
-        print("page to set to end of gallery")
-    else:
-        pass
-    ext_type = input('file extension (e.g. jpg, webp): ')
 
-    workers = os.cpu_count() * 5
-    print(f'TCP THREADS: ｢{workers}｣')
-    download_images_parallel(get_img_url(), str(gallery_id), n, m, workers, img_type=ext_type)
-else:
-    pass
+n = int(input('page from: '))
+m = int(input('page to: '))
+if m > info["filecount"]:
+    m = info["filecount"]
+    print("page to can't exceed the total page")
+    print("page to set to end of gallery")
+
+ext_type = input('file extension (e.g. jpg, webp): ')
+
+workers = os.cpu_count() * 5
+print(f'TCP THREADS: ｢{workers}｣')
+start_time = time.time()
+download_images_parallel(get_img_url(), str(gallery_id), n, m, workers, img_type=ext_type)
+end_time = time.time()
+print(f"DOWNLOAD COMPLETE IN {end_time - start_time:.2f} SECONDS")
 
 
 
