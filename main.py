@@ -7,8 +7,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 url = "3446017"
+
 if url.isdigit():
     url = "https://k-hentai.org/r/" + str(url)
+
 else:
     pass
 
