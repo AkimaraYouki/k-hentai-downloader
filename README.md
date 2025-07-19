@@ -1,12 +1,8 @@
-# Hentai-O-Downloader
-
-
-
 <p align="left">
   <img src="img_src/logo.png" alt="Gallery Preview" style="width:10%; height:auto;" />
 </p>
 
-## K-Hentai Gallery Downloader
+# K-Hentai Gallery Downloader
 
 K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파일을 일괄 다운로드해 주는 파이썬 CLI/GUI 스크립트입니다.  
 멀티스레드 병렬 다운로드로 속도 최적화가 되어 있으며, 여러 갤러리 일괄 처리도 지원합니다.
@@ -22,15 +18,16 @@ K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파�
   - `get_img_urls()` : 이미지 URL 리스트 반환  
   - `download(n, m, workers, img_type)` : 페이지 범위(`n`~`m`)를 지정해 병렬 다운로드  
 - **CLI 모드**  
-  - 단일 ID 또는 쉼표로 구분된 여러 ID 일괄 다운로드  
+  - 단일 ID 또는 쉼표로 구분된 여러 ID 일괄 다운로드
+  - 현재 시스템의 CPU 코어수의 5배의 최대 멀티스레드 설정
   - 다운로드 소요 시간 측정 및 출력  
-- **Kivy GUI 모드**  
+- **Kivy GUI 모드 (개발중)**  
   - 간단한 입력창 + 진행 상태 표시  
   - 스크래치부터 직접 GUI 코드 작성 예제 포함
 
 ---
 
-## Prepare and Download
+## Setup and Download
 
 1. 파이썬 3.7 이상 설치
    - 설치 여부 확인:
@@ -48,20 +45,20 @@ K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파�
    
    
    
-## 사용법
+## Usage
 
-### 입력 가능 형식
+### Supported Input Formats
 - **단일 숫자 ID**: `3445399`
 - **전체 URL**: `https://k-hentai.org/r/3445399`
-- **공백 구분 리스트**: `3445399 3446020`
-- **콤마 구분 리스트**: `3445399,3446020`
+- **공백 구분 리스트**: `3445399 https://k-hentai.org/r/3445399`
+- **콤마 구분 리스트**: `https://k-hentai.org/r/3445399,3446020`
 
 
-### CLI 모드
+### CLI Mode
 1. 가상환경 활성화 (위 준비 단계 참고)
 2. 스크립트 실행:
    ```bash
-   python k_h_d_img_download.py
+   python img_download.py
    ```
 3. 프롬프트에 따라 갤러리 ID 입력:
     단일 ID 일땐 다운받을 페이지를 수동으로 지정해야합니다.
@@ -73,13 +70,36 @@ K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파�
    ```text
    Mode: all         # 전체 페이지 다운로드
    Mode: user_input  # 직접 범위 지정, all 이 이닌 모드에 대해서, 인풋 n ~ m
-   page from: n      # integer
-   page to: m        # if m>n, the program automatically stop
+   page from: n      # 자연수
+   page to: m        # if m>n, 자동으로 m = max_page
    ```
 5. 다운로드 완료 후, 각 갤러리 ID명 폴더에 저장된 이미지를 확인
 
+
+### Optional Parent Directory
+
+다운로드 실행 시, 사용자 입력을 받아 추가로 부모 폴더를 생성할 수 있는 옵션을 제공합니다.
+
+- **프롬프트**: 
+  ```
+  Make new dir (leave empty for not make dir):
+  ```
+- **동작**:
+  - 아무 입력 없이 엔터를 누르면, 현재 디렉터리에 각 갤러리 ID 폴더만 생성하여 다운로드합니다.
+  - 폴더명을 입력하고 엔터 누르면, 해당 이름으로 새로운 폴더를 생성(`mkdir`) 후 그 폴더로 이동(`cd`)하여, 내부에 각 갤러리 ID 폴더를 생성하고 이미지를 다운로드합니다.
+- **예시**:
+  ```text
+  Make new dir (leave empty for not make dir): my_downloads
+  ```
+  다운로드는 다음과 같은 구조로 저장됩니다:
+  ```
+  my_downloads/
+  ├── 3445399/
+  └── 3446020/
+  ```
+
  
-### 오류 처리 예시
+### Error Handling Example
 
 다운로드 중 특정 갤러리에서 메타 정보 파싱에 실패했을 때, 터미널에 다음과 같이 출력되고 사용자 입력을 받습니다:
 
@@ -92,17 +112,8 @@ Skipping gallery 1477273 and continuing.
 - `y`를 입력하면 해당 갤러리를 건너뛰고 다음 갤러리를 계속 처리합니다.
 - `n`을 입력하면 작업을 중단하고 프로그램이 종료됩니다.
 ---
-## GUI 모드 (Kivy) [개발중입니다]
-1. GUI 실행:
-   ```bash
-   python gui.py
-   ```
-2. 'Gallery URL' 입력 칸에 전체 URL 입력:
-   ```
-   https://k-hentai.org/r/3445399
-   ```
-3. 'Start Download' 버튼 클릭
-4. 상태 레이블에서 다운로드 진행 상황과 완료 메시지 확인
+## GUI Mode (Kivy) [In Development]
+
 
 
 <p align="left">

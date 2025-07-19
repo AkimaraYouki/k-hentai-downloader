@@ -29,15 +29,38 @@ from selenium.common.exceptions import SessionNotCreatedException
 # print(favorites[0]["galleries"][0]["id"])
 
 # https://k-hentai.org/?search=fav%3A27549
-from playwright.sync_api import sync_playwright
+# from playwright.sync_api import sync_playwright
+#
+# with sync_playwright() as p:
+#     browser = p.chromium.launch(headless=False)
+#     page = browser.new_page()
+#     page.goto("https://k-hentai.org/?search=fav%3A27549")
+#     # page.fill("[name=username]", "YOUR_ID")
+#     # page.fill("[name=password]", "YOUR_PW")
+#     # page.click("button[type=submit]")
+#     page.wait_for_function()
+#     # favorites_html = page.content()
+#     browser.close()\
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False)
-    page = browser.new_page()
-    page.goto("https://k-hentai.org/?search=fav%3A27549")
-    # page.fill("[name=username]", "YOUR_ID")
-    # page.fill("[name=password]", "YOUR_PW")
-    # page.click("button[type=submit]")
-    page.wait_for_function()
-    # favorites_html = page.content()
-    browser.close()
+n = int(input('page from: '))
+m = int(input('page to: '))
+info = 42
+
+while True:
+    if n < 1 or m < 1:
+        print("only natural number can be entered")
+    elif n > m:
+        print("page from can't exceed page to")
+    elif m > info:
+        print("page to can't exceed the total page")
+        print("page to set to end of gallery")
+        m = info
+        break
+    else:
+        break
+    n = int(input('page from: '))
+    m = int(input('page to: '))
+
+print(' ')
+print(f'page from: {n}')
+print(f'page to: {m}')

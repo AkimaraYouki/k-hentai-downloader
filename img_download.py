@@ -16,6 +16,7 @@ import sys
 # - Download selected pages
 
 class GalleryDownloader:
+
     def __init__(self, gallery_id):
         # Normalize gallery_id to its numeric component
         gid = str(gallery_id).split("/")[-1]
@@ -77,6 +78,7 @@ def download_images_parallel(urls, folder, def_n, def_m, def_workers=8, img_type
     target_urls = urls[def_n - 1:def_m]
     total = len(target_urls)
     print(f" TO {folder} FOLDER, DOWNLOAD {total} IMAGE (TCP THREADS={def_workers})")
+    print("-------------------------")
 
     tasks = []
     with ThreadPoolExecutor(max_workers=def_workers) as exe:
@@ -109,7 +111,8 @@ class Main_Activity():
                 self.Download(gid, mode, ext_type)
             return
 
-        gallery_id = url.split("/")[-1]
+        # Strip URL fragment if present (e.g., "#1")
+        gallery_id = url.split("/")[-1].split("#")[0]
 
         downloader = GalleryDownloader(gallery_id)
 
@@ -119,15 +122,13 @@ class Main_Activity():
         print("-------------------------")
         print("FILE INFO")
         print("-------------------------")
-        print(f'URL: ｢{str(url)}｣')
         print(f'GALLERY ID: ｢{gallery_id}｣')
         print(f'TITLE: ｢{info["title"]}｣')
         print(f'PAGES: ｢{info["filecount"]}｣')
-        print("-------------------------")
         print(f'TAGS: ｢{", ".join(downloader.get_tags())}｣')
         print("-------------------------")
         print("BEFORE DOWNLOAD . . . ")
-        print("-------------------------")
+
 
 
         # If mode is user_input, prompt for page range
@@ -135,18 +136,34 @@ class Main_Activity():
             n = 1
             m = info["filecount"]
         else:
-
             n = int(input('page from: '))
             m = int(input('page to: '))
 
-            if m > info["filecount"]:
-                m = info["filecount"]
-                print("page to can't exceed the total page")
-                print("page to set to end of gallery")
+
+            while True:
+                if n < 1 or m < 1:
+                    print("only natural number can be entered")
+                elif n > m:
+                    print("page from can't exceed page to")
+                elif m > info["filecount"]:
+                    print("page to can't exceed the total page")
+                    print("page to set to end of gallery")
+                    m = info["filecount"]
+                    break
+                else:
+                    break
+                n = int(input('page from: '))
+                m = int(input('page to: '))
+
+            print(' ')
+            print(f'page from: {n}')
+            print(f'page to: {m}')
+
 
         # Determine the number of worker threads based on CPU count
         workers = os.cpu_count() * 5
         print(f'TCP THREADS: ｢{workers}｣')
+        print("-------------------------")
         # Measure download duration for this gallery
         start_time = time.time()
         # Download pages
@@ -169,9 +186,13 @@ def handle_error(gallery_id, exception):
 if __name__ == "__main__":
     import re
     target = input("input gallery id or gallery id list:")
-    print("-------------------------")
-    print(f'Ready to download ｢{target}｣')
-    print("-------------------------")
+    make_dir = input("Make new dir (leave empty for not make dir): ").strip()
+    if make_dir:
+        os.makedirs(make_dir, exist_ok=True)
+        os.chdir(make_dir)
+        print(f'MADE DIR NAMED ｢{make_dir}｣')
+    else:
+        print('dir set to current dir')
 
     raw_ids = re.split(r"[,\s]+", target.strip())
     gallery_ids = [gid for gid in raw_ids if gid]
