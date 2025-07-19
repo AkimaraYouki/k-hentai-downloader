@@ -1,5 +1,11 @@
 # Hentai-O-Downloader
 
+
+
+<p align="left">
+  <img src="img_src/logo.png" alt="Gallery Preview" style="width:10%; height:auto;" />
+</p>
+
 ## K-Hentai Gallery Downloader
 
 K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파일을 일괄 다운로드해 주는 파이썬 CLI/GUI 스크립트입니다.  
