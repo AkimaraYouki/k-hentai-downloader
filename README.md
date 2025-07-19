@@ -1,3 +1,78 @@
 # Hentai-O-Downloader
-This is tool for download pages of HORNY thing.
-![cb304b165663134eb98a2aa1b82556836cc0d17c.webp](img_src/cb304b165663134eb98a2aa1b82556836cc0d17c.webp)
+
+## K-Hentai Gallery Downloader
+
+K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파일을 일괄 다운로드해 주는 파이썬 CLI/GUI 스크립트입니다.  
+멀티스레드 병렬 다운로드로 속도 최적화가 되어 있으며, 여러 갤러리 일괄 처리도 지원합니다.
+
+---
+
+## Main Function
+
+- `fetch_gallery_info_http(gallery_id)`  
+  - HTTP 요청만으로 **갤러리 메타 정보**(파일 수, 제목, 태그 등) 추출  
+- `GalleryDownloader` 클래스  
+  - `get_tags()` : 태그 목록 반환  
+  - `get_img_urls()` : 이미지 URL 리스트 반환  
+  - `download(n, m, workers, img_type)` : 페이지 범위(`n`~`m`)를 지정해 병렬 다운로드  
+- **CLI 모드**  
+  - 단일 ID 또는 쉼표로 구분된 여러 ID 일괄 다운로드  
+  - 다운로드 소요 시간 측정 및 출력  
+- **Kivy GUI 모드**  
+  - 간단한 입력창 + 진행 상태 표시  
+  - 스크래치부터 직접 GUI 코드 작성 예제 포함
+
+---
+
+## Prepare and Download
+
+1. 파이썬 3.7 이상 설치  
+2. 가상환경 생성 및 활성화 (권장)
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate   # macOS/Linux
+   .venv\Scripts\activate      # Windows
+    
+   pip install requests kivy # GUI it's optinal who wanna use GUI
+   
+   
+   
+## 사용법
+
+### CLI 모드
+1. 가상환경 활성화 (위 준비 단계 참고)
+2. 스크립트 실행:
+   ```bash
+   python k_h_d_img_download.py
+   ```
+3. 프롬프트에 따라 갤러리 ID 입력:
+    단일 ID 일땐 다운받을 페이지를 수동으로 지정해야합니다.
+4. ID 형식 말고도 전체 갤러리 url도 입력 할 수 있습니다.
+   ```text
+   Enter gallery ID or list (comma separated): 3445399,3446020
+   ```
+4. 다운로드 범위 설정 (옵션):
+   ```text
+   Mode: all         # 전체 페이지 다운로드
+   Mode: user_input  # 직접 범위 지정, all 이 이닌 모드에 대해서, 인풋 n ~ m
+   page from: n      # integer
+   page to: m        # if m>n, the program automatically stop
+   ```
+5. 다운로드 완료 후, 각 갤러리 ID명 폴더에 저장된 이미지를 확인
+
+### GUI 모드 (Kivy) [개발중입니다]
+1. GUI 실행:
+   ```bash
+   python gui.py
+   ```
+2. 'Gallery URL' 입력 칸에 전체 URL 입력:
+   ```
+   https://k-hentai.org/r/3445399
+   ```
+3. 'Start Download' 버튼 클릭
+4. 상태 레이블에서 다운로드 진행 상황과 완료 메시지 확인
+
+
+<p align="left">
+  <img src="img_src/cb304b165663134eb98a2aa1b82556836cc0d17c.webp" alt="Gallery Preview" style="width:50%; height:auto;" />
+</p>

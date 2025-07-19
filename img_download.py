@@ -1,4 +1,3 @@
-
 import re
 import json
 import os
@@ -131,9 +130,22 @@ class Main_Activity():
         print(f"DOWNLOAD COMPLETE IN {end_time - start_time:.2f} SECONDS")
 
 if __name__ == "__main__":
+    list_gallery = []
+    target = input("input gallery id or gallery id list:")
+    print("-------------------------")
+    print(f'Ready to download ｢{target}｣')
+    print("-------------------------")
+    if "," in target:
+        gallerys = target.split(",")
+
+        start_time = time.time()
+        for i in gallerys:
+            Main_Activity().Download(str(i), 'all', 'jpg')
+        end_time = time.time()
+        print(f"TOTAL DURATION OF MULTIPLE DOWNLOAD COMPLETE IN {end_time - start_time:.2f} SECONDS")
+    else:
+        Main_Activity().Download(target, 'user_input', 'jpg')
 
 
-
-    Main_Activity().Download("3446631", 'all', 'jpg')
 
 
