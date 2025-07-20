@@ -25,7 +25,7 @@ class GalleryDownloader:
 
     # Return a list of tag names from gallery metadata
     def get_tags(self):
-        # Return list of tag names
+        # Return the list of tag names
         return [tag_entry['tag'][1] for tag_entry in self.info.get('tags', [])]
 
     # Return a list of full image URLs for this gallery
@@ -72,7 +72,7 @@ def download_one(args):
     return path
 
 # Download a slice of URLs in parallel using ThreadPoolExecutor
-def download_images_parallel(urls, folder, def_n, def_m, def_workers=8, img_type=None):
+def download_images_parallel(urls, folder, def_n, def_m, def_workers, img_type=None):
     # Ensure target folder exists
     os.makedirs(folder, exist_ok=True)
     target_urls = urls[def_n - 1:def_m]
@@ -94,8 +94,8 @@ def download_images_parallel(urls, folder, def_n, def_m, def_workers=8, img_type
     print("DONE")
 
 # Main controller handling CLI input and orchestrating per-gallery downloads
-class Main_Activity():
-    def Download(self, url, mode, ext_type):
+class MainActivity:
+    def download(self, url, mode, ext_type):
         # Normalize URL or ID input to full URL
         if url.isdigit():
             url = f"https://k-hentai.org/r/{url}"
@@ -106,9 +106,9 @@ class Main_Activity():
 
         # Handle comma-separated list of gallery IDs
         if "," in url:
-            gallery_ids = [u.strip() for u in url.split(",") if u.strip()]
-            for gid in gallery_ids:
-                self.Download(gid, mode, ext_type)
+            gallery_ids2 = [u.strip() for u in url.split(",") if u.strip()]
+            for gid in gallery_ids2:
+                self.download(gid, mode, ext_type)
             return
 
         # Strip URL fragment if present (e.g., "#1")
@@ -131,7 +131,7 @@ class Main_Activity():
 
 
 
-        # If mode is user_input, prompt for page range
+        # If the mode is user_input, prompt for page range
         if mode == "all":
             n = 1
             m = info["filecount"]
@@ -160,16 +160,15 @@ class Main_Activity():
             print(f'page to: {m}')
 
 
-        # Determine the number of worker threads based on CPU count
-        workers = os.cpu_count() * 5
-        print(f'TCP THREADS: ｢{workers}｣')
+        # Let GalleryDownloader.download determine the number of worker threads
+        workers = None
         print("-------------------------")
         # Measure download duration for this gallery
-        start_time = time.time()
+        start_time_2 = time.time()
         # Download pages
         downloader.download(n, m, workers, img_type=ext_type)
-        end_time = time.time()
-        print(f"DOWNLOAD COMPLETE IN {end_time - start_time:.2f} SECONDS")
+        end_time_2 = time.time()
+        print(f"DOWNLOAD COMPLETE IN {end_time_2 - start_time_2:.2f} SECONDS")
 
 
 # Prompt user on error: abort or skip failed gallery
@@ -185,6 +184,7 @@ def handle_error(gallery_id, exception):
 # Entry point: parse input, support single or multiple gallery IDs
 if __name__ == "__main__":
     import re
+    print("-------------------------")
     target = input("input gallery id or gallery id list:")
     make_dir = input("Make new dir (leave empty for not make dir): ").strip()
     if make_dir:
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         start_time = time.time()
         for gid in gallery_ids:
             try:
-                Main_Activity().Download(gid, 'all', 'jpg')
+                MainActivity().download(gid, 'all', 'jpg')
             except Exception as e:
                 handle_error(gid, e)
         end_time = time.time()
@@ -211,6 +211,6 @@ if __name__ == "__main__":
     else:
 
         try:
-            Main_Activity().Download(gallery_ids[0], 'user_input', 'jpg')
+            MainActivity().download(gallery_ids[0], 'user_input', 'jpg')
         except Exception as e:
             handle_error(gallery_ids[0], e)
