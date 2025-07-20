@@ -4,7 +4,7 @@
 
 # K-Hentai Gallery Downloader
 
-K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파일을 일괄 다운로드해 주는 파이썬 CLI/GUI 스크립트입니다.  
+K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파일을 일괄 다운로드해 주는 파이썬 CLI 스크립트입니다.  
 멀티스레드 병렬 다운로드로 속도 최적화가 되어 있으며, 여러 갤러리 일괄 처리도 지원합니다.
 
 ---
@@ -21,9 +21,7 @@ K-Hentai 사이트의 갤러리 ID를 입력하면 페이지 내 이미지 파�
   - 단일 ID 또는 쉼표로 구분된 여러 ID 일괄 다운로드
   - 현재 시스템의 CPU 코어수의 3배의 멀티스레드 설정 (최대 30개, 차단방지)
   - 다운로드 소요 시간 측정 및 출력  
-- **Kivy GUI 모드 (개발중)**  
-  - 간단한 입력창 + 진행 상태 표시  
-  - 스크래치부터 직접 GUI 코드 작성 예제 포함
+
 
 ---
 
@@ -111,11 +109,10 @@ Skipping gallery 1477273 and continuing.
 
 - `y`를 입력하면 해당 갤러리를 건너뛰고 다음 갤러리를 계속 처리합니다.
 - `n`을 입력하면 작업을 중단하고 프로그램이 종료됩니다.
----
-## GUI Mode (Kivy) [In Development]
 
 
 
-<p align="left">
+
+<p>
   <img src="img_src/cb304b165663134eb98a2aa1b82556836cc0d17c.webp" alt="Gallery Preview" style="width:50%; height:auto;" />
 </p>
