@@ -1,6 +1,6 @@
-<p align="left">
-  <img src="img_src/logo.png" alt="Gallery Preview" style="width:10%; height:auto;" />
-</p>
+
+
+#   <p style="color: red;">NSFW WARNING</p> 
 
 # K-Hentai Gallery Downloader
 

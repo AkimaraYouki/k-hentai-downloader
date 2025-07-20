@@ -136,14 +136,28 @@ class Main_Activity():
             n = 1
             m = info["filecount"]
         else:
-
             n = int(input('page from: '))
             m = int(input('page to: '))
 
-            if m > info["filecount"]:
-                m = info["filecount"]
-                print("page to can't exceed the total page")
-                print("page to set to end of gallery")
+
+            while True:
+                if n < 1 or m < 1:
+                    print("only natural number can be entered")
+                elif n > m:
+                    print("page from can't exceed page to")
+                elif m > info["filecount"]:
+                    print("page to can't exceed the total page")
+                    print("page to set to end of gallery")
+                    m = info["filecount"]
+                    break
+                else:
+                    break
+                n = int(input('page from: '))
+                m = int(input('page to: '))
+
+            print(' ')
+            print(f'page from: {n}')
+            print(f'page to: {m}')
 
 
         # Determine the number of worker threads based on CPU count
