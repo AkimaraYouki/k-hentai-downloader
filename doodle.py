@@ -42,25 +42,32 @@ from selenium.common.exceptions import SessionNotCreatedException
 #     # favorites_html = page.content()
 #     browser.close()\
 
-n = int(input('page from: '))
-m = int(input('page to: '))
-info = 42
+# n = int(input('page from: '))
+# m = int(input('page to: '))
+# info = 42
+#
+# while True:
+#     if n < 1 or m < 1:
+#         print("only natural number can be entered")
+#     elif n > m:
+#         print("page from can't exceed page to")
+#     elif m > info:
+#         print("page to can't exceed the total page")
+#         print("page to set to end of gallery")
+#         m = info
+#         break
+#     else:
+#         break
+#     n = int(input('page from: '))
+#     m = int(input('page to: '))
+#
+# print(' ')
+# print(f'page from: {n}')
+# print(f'page to: {m}')
 
-while True:
-    if n < 1 or m < 1:
-        print("only natural number can be entered")
-    elif n > m:
-        print("page from can't exceed page to")
-    elif m > info:
-        print("page to can't exceed the total page")
-        print("page to set to end of gallery")
-        m = info
-        break
-    else:
-        break
-    n = int(input('page from: '))
-    m = int(input('page to: '))
+list = '''https://k-hentai.org/r/3444597#39https://k-hentai.org/r/3444396#5https://k-hentai.org/r/3441679#1https://k-hentai.org/r/3441671#1https://k-hentai.org/r/3441663#1https://k-hentai.org/r/3439932#1https://k-hentai.org/r/3431675#11https://k-hentai.org/r/3437523#1https://k-hentai.org/r/3425841#1https://k-hentai.org/r/3421633#1https://k-hentai.org/r/3415973#1https://k-hentai.org/r/3410183#1https://k-hentai.org/r/3409403#1https://k-hentai.org/r/3408955#1https://k-hentai.org/r/3407102#1https://k-hentai.org/r/3407111#1https://k-hentai.org/r/3389643#6https://k-hentai.org/r/3389334#1https://k-hentai.org/r/3381540#1https://k-hentai.org/r/3360282#1https://k-hentai.org/r/3373349#1https://k-hentai.org/r/3361898#1'''
+l1 = []
+for i in list.split("#"):
+    l1.append(i.split('/')[-1]+' ')
+print("".join(l1))
 
-print(' ')
-print(f'page from: {n}')
-print(f'page to: {m}')

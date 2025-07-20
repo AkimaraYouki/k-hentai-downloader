@@ -39,7 +39,7 @@ class GalleryDownloader:
         urls = self.get_img_urls()
         if workers is None:
             import os
-            workers = os.cpu_count() * 5
+            workers = min(os.cpu_count() * 3, 30)
         download_images_parallel(urls, self.gallery_id, n, m, workers, img_type=img_type)
 
 # Fetch the gallery page HTML via HTTP and extract the JSON object for metadata
