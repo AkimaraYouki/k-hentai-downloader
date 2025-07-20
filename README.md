@@ -1,6 +1,6 @@
 
 
-#   <p style="color: red;">NSFW WARNING</p> 
+# <p style="color: red;">NSFW WARNING</p> 
 
 # K-Hentai Gallery Downloader
 
