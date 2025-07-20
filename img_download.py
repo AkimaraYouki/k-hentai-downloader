@@ -9,6 +9,13 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import sys
+from requests.adapters import HTTPAdapter
+
+# Global HTTP session with connection pooling
+session = requests.Session()
+adapter = HTTPAdapter(pool_connections=100, pool_maxsize=100)
+session.mount("https://", adapter)
+session.mount("http://", adapter)
 
 # Encapsulates operations for a single gallery:
 # - Fetch metadata (info)
@@ -46,11 +53,11 @@ class GalleryDownloader:
 def fetch_gallery_info_http(def_gallery_id):
     # Send HTTP GET request to fetch page HTML
     def_url = f"https://k-hentai.org/r/{def_gallery_id}"
-    html = requests.get(def_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5).text
+    html = session.get(def_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5).text
 
     def_m = re.search(r'const gallery\s*=\s*({.*?});', html, re.DOTALL)
     if not def_m:
-        raise RuntimeError("CANT NOT FIND GALLERY INFO")
+        raise RuntimeError("CANNOT FIND GALLERY INFO")
     obj = def_m.group(1)
 
     try:
@@ -64,7 +71,7 @@ def fetch_gallery_info_http(def_gallery_id):
 def download_one(args):
     def_url, folder, idx, ext = args
     path = os.path.join(folder, f"{folder}_{idx}.{ext}")
-    resp = requests.get(def_url, stream=True, timeout=10)
+    resp = session.get(def_url, stream=True, timeout=10)
     resp.raise_for_status()
     with open(path, "wb") as f:
         for chunk in resp.iter_content(8192):
@@ -77,11 +84,12 @@ def download_images_parallel(urls, folder, def_n, def_m, def_workers, img_type=N
     os.makedirs(folder, exist_ok=True)
     target_urls = urls[def_n - 1:def_m]
     total = len(target_urls)
-    print(f" TO {folder} FOLDER, DOWNLOAD {total} IMAGE (TCP THREADS={def_workers})")
+    max_workers = min(def_workers, total)
+    print(f"Downloading {total} images with {max_workers} threads into '{folder}'")
     print("-------------------------")
 
     tasks = []
-    with ThreadPoolExecutor(max_workers=def_workers) as exe:
+    with ThreadPoolExecutor(max_workers=max_workers) as exe:
         for idx, def_url in enumerate(target_urls, start=def_n):
             if img_type:
                 ext = img_type

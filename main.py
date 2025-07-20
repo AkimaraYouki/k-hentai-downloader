@@ -9,6 +9,13 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import sys
+from requests.adapters import HTTPAdapter
+
+# Global HTTP session with connection pooling
+session = requests.Session()
+adapter = HTTPAdapter(pool_connections=100, pool_maxsize=100)
+session.mount("https://", adapter)
+session.mount("http://", adapter)
 
 # Encapsulates operations for a single gallery:
 # - Fetch metadata (info)
@@ -25,7 +32,7 @@ class GalleryDownloader:
 
     # Return a list of tag names from gallery metadata
     def get_tags(self):
-        # Return list of tag names
+        # Return the list of tag names
         return [tag_entry['tag'][1] for tag_entry in self.info.get('tags', [])]
 
     # Return a list of full image URLs for this gallery
@@ -39,18 +46,18 @@ class GalleryDownloader:
         urls = self.get_img_urls()
         if workers is None:
             import os
-            workers = os.cpu_count() * 5
+            workers = min(os.cpu_count() * 3, 30)
         download_images_parallel(urls, self.gallery_id, n, m, workers, img_type=img_type)
 
 # Fetch the gallery page HTML via HTTP and extract the JSON object for metadata
 def fetch_gallery_info_http(def_gallery_id):
     # Send HTTP GET request to fetch page HTML
     def_url = f"https://k-hentai.org/r/{def_gallery_id}"
-    html = requests.get(def_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5).text
+    html = session.get(def_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5).text
 
     def_m = re.search(r'const gallery\s*=\s*({.*?});', html, re.DOTALL)
     if not def_m:
-        raise RuntimeError("CANT NOT FIND GALLERY INFO")
+        raise RuntimeError("CANNOT FIND GALLERY INFO")
     obj = def_m.group(1)
 
     try:
@@ -64,7 +71,7 @@ def fetch_gallery_info_http(def_gallery_id):
 def download_one(args):
     def_url, folder, idx, ext = args
     path = os.path.join(folder, f"{folder}_{idx}.{ext}")
-    resp = requests.get(def_url, stream=True, timeout=10)
+    resp = session.get(def_url, stream=True, timeout=10)
     resp.raise_for_status()
     with open(path, "wb") as f:
         for chunk in resp.iter_content(8192):
@@ -72,16 +79,17 @@ def download_one(args):
     return path
 
 # Download a slice of URLs in parallel using ThreadPoolExecutor
-def download_images_parallel(urls, folder, def_n, def_m, def_workers=8, img_type=None):
+def download_images_parallel(urls, folder, def_n, def_m, def_workers, img_type=None):
     # Ensure target folder exists
     os.makedirs(folder, exist_ok=True)
     target_urls = urls[def_n - 1:def_m]
     total = len(target_urls)
-    print(f" TO {folder} FOLDER, DOWNLOAD {total} IMAGE (TCP THREADS={def_workers})")
+    max_workers = min(def_workers, total)
+    print(f"Downloading {total} images with {max_workers} threads into '{folder}'")
     print("-------------------------")
 
     tasks = []
-    with ThreadPoolExecutor(max_workers=def_workers) as exe:
+    with ThreadPoolExecutor(max_workers=max_workers) as exe:
         for idx, def_url in enumerate(target_urls, start=def_n):
             if img_type:
                 ext = img_type
@@ -94,8 +102,8 @@ def download_images_parallel(urls, folder, def_n, def_m, def_workers=8, img_type
     print("DONE")
 
 # Main controller handling CLI input and orchestrating per-gallery downloads
-class Main_Activity():
-    def Download(self, url, mode, ext_type):
+class MainActivity:
+    def download(self, url, mode, ext_type):
         # Normalize URL or ID input to full URL
         if url.isdigit():
             url = f"https://k-hentai.org/r/{url}"
@@ -106,9 +114,9 @@ class Main_Activity():
 
         # Handle comma-separated list of gallery IDs
         if "," in url:
-            gallery_ids = [u.strip() for u in url.split(",") if u.strip()]
-            for gid in gallery_ids:
-                self.Download(gid, mode, ext_type)
+            gallery_ids2 = [u.strip() for u in url.split(",") if u.strip()]
+            for gid in gallery_ids2:
+                self.download(gid, mode, ext_type)
             return
 
         # Strip URL fragment if present (e.g., "#1")
@@ -131,7 +139,7 @@ class Main_Activity():
 
 
 
-        # If mode is user_input, prompt for page range
+        # If the mode is user_input, prompt for page range
         if mode == "all":
             n = 1
             m = info["filecount"]
@@ -160,16 +168,15 @@ class Main_Activity():
             print(f'page to: {m}')
 
 
-        # Determine the number of worker threads based on CPU count
-        workers = os.cpu_count() * 5
-        print(f'TCP THREADS: ｢{workers}｣')
+        # Let GalleryDownloader.download determine the number of worker threads
+        workers = None
         print("-------------------------")
         # Measure download duration for this gallery
-        start_time = time.time()
+        start_time_2 = time.time()
         # Download pages
         downloader.download(n, m, workers, img_type=ext_type)
-        end_time = time.time()
-        print(f"DOWNLOAD COMPLETE IN {end_time - start_time:.2f} SECONDS")
+        end_time_2 = time.time()
+        print(f"DOWNLOAD COMPLETE IN {end_time_2 - start_time_2:.2f} SECONDS")
 
 
 # Prompt user on error: abort or skip failed gallery
@@ -185,6 +192,7 @@ def handle_error(gallery_id, exception):
 # Entry point: parse input, support single or multiple gallery IDs
 if __name__ == "__main__":
     import re
+    print("-------------------------")
     target = input("input gallery id or gallery id list:")
     make_dir = input("Make new dir (leave empty for not make dir): ").strip()
     if make_dir:
@@ -202,7 +210,7 @@ if __name__ == "__main__":
         start_time = time.time()
         for gid in gallery_ids:
             try:
-                Main_Activity().Download(gid, 'all', 'jpg')
+                MainActivity().download(gid, 'all', 'jpg')
             except Exception as e:
                 handle_error(gid, e)
         end_time = time.time()
@@ -211,6 +219,6 @@ if __name__ == "__main__":
     else:
 
         try:
-            Main_Activity().Download(gallery_ids[0], 'user_input', 'jpg')
+            MainActivity().download(gallery_ids[0], 'user_input', 'jpg')
         except Exception as e:
             handle_error(gallery_ids[0], e)
